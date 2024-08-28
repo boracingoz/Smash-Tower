@@ -11,6 +11,7 @@ public class LevelSpawner : MonoBehaviour
     public GameObject winPrefab;
 
     private GameObject _temp1, _temp2;
+    
 
     public int level = 1, addOn = 7;
     private float i = 0;
@@ -19,13 +20,14 @@ public class LevelSpawner : MonoBehaviour
     {
         Vector3 pipePos = new Vector3(0, -1.675853f, 0.7320552f);
         Instantiate(pipePrefab, pipePos, Quaternion.identity);
-
+       
         if (level > 9)
         {
             addOn = 0;
         }
 
         ModelSelection();
+        float random = Random.value;
         for (i = 0; i > -level - addOn; i-= 0.5f)
         {
             if (level <= 20)
@@ -47,11 +49,29 @@ public class LevelSpawner : MonoBehaviour
 
             _temp1.transform.position = new Vector3(0, i-0.01f,0);
             _temp1.transform.eulerAngles = new Vector3(0, i*8,0);
+
+            if (Mathf.Abs(i) >= level * .3f && Mathf.Abs(i) <= level * .6f)
+            {
+                _temp1.transform.eulerAngles = new Vector3(0, i * 8, 0);
+                _temp1.transform.eulerAngles += Vector3.up * 180;
+            }else if (Mathf.Abs(i) >= level * .8f)
+            {
+                _temp1.transform.eulerAngles += new Vector3(0, i * 8, 0);
+
+                if (random > .75f)
+                {
+                    _temp1.transform.eulerAngles += Vector3.up * 180;
+                }
+            }
+
+            _temp1.transform.parent = FindObjectOfType<Rotator>().transform;
+
         }
 
         _temp2 = Instantiate(winPrefab);
-        _temp2.transform.position = new Vector3(0,i-01f,0);
+        _temp2.transform.position = new Vector3(0,i - 01f,0);
     }
+
 
     // Update is called once per frame
     void Update()
