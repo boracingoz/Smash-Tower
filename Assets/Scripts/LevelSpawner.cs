@@ -11,7 +11,11 @@ public class LevelSpawner : MonoBehaviour
     public GameObject winPrefab;
 
     private GameObject _temp1, _temp2;
-    
+
+    private const float SCALE_INCREMENT_Y = 1.08f;
+    private const float INITIAL_SCALE_Y = 10.2f;
+    private const float INITIAL_SCALE_XZ = 1.2f;
+
 
     public int level = 1, addOn = 7;
     private float i = 0;
@@ -19,8 +23,10 @@ public class LevelSpawner : MonoBehaviour
     void Start()
     {
         Vector3 pipePos = new Vector3(0, -1.675853f, 0.7320552f);
-        Instantiate(pipePrefab, pipePos, Quaternion.identity);
-       
+        GameObject pipe = Instantiate(pipePrefab, pipePos, Quaternion.identity);
+        float scaleY = INITIAL_SCALE_Y + (level - 1) * SCALE_INCREMENT_Y;
+        pipe.transform.localScale = new Vector3(INITIAL_SCALE_XZ, scaleY, INITIAL_SCALE_XZ);
+
         if (level > 9)
         {
             addOn = 0;
