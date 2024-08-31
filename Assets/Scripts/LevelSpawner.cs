@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelSpawner : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class LevelSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        level = PlayerPrefs.GetInt("level", 1);
+
         Vector3 pipePos = new Vector3(0, -1.675853f, 0.7320552f);
         GameObject pipe = Instantiate(pipePrefab, pipePos, Quaternion.identity);
         float scaleY = INITIAL_SCALE_Y + (level - 1) * SCALE_INCREMENT_Y;
@@ -121,5 +124,11 @@ public class LevelSpawner : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    public void NextLevel()
+    {
+        PlayerPrefs.SetInt("Level", PlayerPrefs.GetInt("Level") + 1);
+        SceneManager.LoadScene(0);
     }
 }
