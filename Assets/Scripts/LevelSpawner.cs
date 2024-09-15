@@ -21,7 +21,7 @@ public class LevelSpawner : MonoBehaviour
     public int level = 1, addOn = 7;
     private float i = 0;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         level = PlayerPrefs.GetInt("level", 1);
 
