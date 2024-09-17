@@ -7,7 +7,7 @@ public class Ball : MonoBehaviour
     private Rigidbody _rb;
     private float _curTime;
 
-    private bool _smash, _invicible;
+    private bool _smash, _invincible;
 
     public enum BallState
     {
@@ -27,10 +27,7 @@ public class Ball : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
     }
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+   
 
     // Update is called once per frame
     void Update()
@@ -47,7 +44,7 @@ public class Ball : MonoBehaviour
                 _smash = false;
             }
 
-            if (_invicible)
+            if (_invincible)
             {
                 _curTime -= Time.deltaTime * .35f;
 
@@ -69,12 +66,12 @@ public class Ball : MonoBehaviour
             if (_curTime >= 1)
             {
                 _curTime = 1;
-                _invicible = true;
+                _invincible = true;
             }
             else if (_curTime <= 0)
             {
                 _curTime = 0;
-                _invicible = false;
+                _invincible = false;
             }
         }
 
@@ -111,7 +108,19 @@ public class Ball : MonoBehaviour
 
     public void IncreaseBrokenStacks()
     {
-        if (!_invicible)
+        if (ScoreManager.instance == null)
+        {
+            Debug.LogError("ScoreManager instance is null!");
+            return;
+        }
+
+        if (SoundManager.instance == null)
+        {
+            Debug.LogError("SoundManager instance is null!");
+            return;
+        }
+
+        if (!_invincible)
         {
             ScoreManager.instance.AddScore(1);
             SoundManager.instance.PlaySoundFX(destroyClip, 0.5f);
@@ -125,6 +134,12 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision target)
     {
+        if (SoundManager.instance == null)
+        {
+            Debug.LogError("SoundManager instance is null!");
+            return;
+        }
+
         if (!_smash)
         {
             _rb.velocity = new Vector3(0, 50 * Time.deltaTime * 5, 0);
@@ -132,32 +147,64 @@ public class Ball : MonoBehaviour
         }
         else
         {
-            if (_invicible)
+            if (_invincible)
             {
-                if (target.gameObject.tag == "enemy" || target.gameObject.tag == "plane")
+                if (target.gameObject.CompareTag("enemy") || target.gameObject.CompareTag("plane"))
                 {
-                    target.transform.parent.GetComponent<StackController>().ShatterAllParts();
+                    ShatterStack(target);
                 }
             }
             else
             {
-                if (target.gameObject.tag == "enemy")
+                if (target.gameObject.CompareTag("enemy"))
                 {
-                    target.transform.parent.GetComponent<StackController>().ShatterAllParts();
+                    ShatterStack(target);
                 }
 
-                if (target.gameObject.tag == "plane")
+                if (target.gameObject.CompareTag("plane"))
                 {
-                    Debug.Log("Over!");
-                    ScoreManager.instance.ResetScore();
-                    SoundManager.instance.PlaySoundFX(deadClip, 0.5f);
+                    HandleGameOver();
                 }
             }
         }
 
-        if (target.gameObject.tag == "Finish" && ballState == BallState.Playing)
+        if (target.gameObject.CompareTag("Finish") && ballState == BallState.Playing)
         {
-            ballState = BallState.Finish;
+            HandleFinish();
+        }
+    }
+
+    private void ShatterStack(Collision target)
+    {
+        StackController stackController = target.transform.parent.GetComponent<StackController>();
+        if (stackController != null)
+        {
+            stackController.ShatterAllParts();
+        }
+        else
+        {
+            Debug.LogError("StackController not found on parent of collided object!");
+        }
+    }
+
+    private void HandleGameOver()
+    {
+        Debug.Log("Game Over!");
+        if (ScoreManager.instance != null)
+        {
+            ScoreManager.instance.ResetScore();
+        }
+        if (SoundManager.instance != null)
+        {
+            SoundManager.instance.PlaySoundFX(deadClip, 0.5f);
+        }
+    }
+
+    private void HandleFinish()
+    {
+        ballState = BallState.Finish;
+        if (SoundManager.instance != null)
+        {
             SoundManager.instance.PlaySoundFX(winClip, 0.7f);
         }
     }

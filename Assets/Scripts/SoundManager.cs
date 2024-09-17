@@ -7,7 +7,7 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance;
     private AudioSource _audioSource;
-   
+
     public bool sound = true;
 
     private void Awake()
@@ -18,7 +18,7 @@ public class SoundManager : MonoBehaviour
 
     private void MakeSingleton()
     {
-        if (instance == null)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
         }
@@ -36,7 +36,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySoundFX(AudioClip clip, float volume)
     {
-        if (sound)
+        if (sound && _audioSource != null && clip != null)
         {
             _audioSource.PlayOneShot(clip, volume);
         }
